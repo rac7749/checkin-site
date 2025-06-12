@@ -1,31 +1,274 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>簽到系統</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>每日簽到</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fef3e2;
+      background-image: url('images/bg-default.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .container {
+      display: flex;
+      padding: 30px;
+      border-radius: 20px;
+      background-color: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      max-width: 1000px;
+      width: 95%;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+      gap: 20px;
+      position: relative;
+    }
+
+    .left {
+      width: 60%;
+      position: relative;
+    }
+
+    .left::before {
+      content: '';
+      position: absolute;
+      left: -40px;
+      top: 0;
+      width: 100px;
+      height: 100px;
+      background-image: url('images/decoration-left.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      z-index: -1;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: auto auto auto;
+      gap: 10px;
+    }
+
+    .day {
+      height: 100px;
+      border: 2px solid #dbdbdb;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      position: relative;
+      background-color: rgba(255, 255, 255, 0.9);
+      background-image: url('images/day-bg-default.png');
+      background-size: cover;
+      background-position: center;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .day::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.1);
+      z-index: 0;
+    }
+
+    .day > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .day-name {
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+
+    .day-date {
+      font-size: 12px;
+      color: #666;
+      margin-top: 2px;
+    }
+
+    .day:hover:not(.disabled) {
+      background-color: #f0f0f0;
+    }
+
+    .day.checked {
+      background-color: #e8f5e8;
+      border-color: #4caf50;
+    }
+
+    .day.checked::after {
+      content: '🐾';
+      font-size: 24px;
+      position: absolute;
+      top: 3px;
+      right: 5px;
+      z-index: 2;
+    }
+
+    .day.disabled {
+      pointer-events: none;
+      opacity: 0.4;
+    }
+
+    .day.today:not(.checked) {
+      border-color: #ff9800;
+      background-color: #fff3e0;
+    }
+
+    .day:nth-child(7) {
+      grid-column: span 3;
+    }
+
+    .right {
+      width: 40%;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .char {
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .char h3 {
+      margin: 0 0 15px 0;
+      color: #333;
+    }
+
+    .character-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin: 0 auto 10px;
+      background-color: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+
+    .character-image img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .character-name {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .character-level {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .reward {
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .reward h3 {
+      margin: 0 0 10px 0;
+      color: #333;
+    }
+
+    .switch-user {
+      position: absolute;
+      bottom: -60px;
+      left: 0;
+      padding: 10px 20px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+    }
+
+    .switch-user:hover {
+      background-color: #45a049;
+    }
+
+    /* 主題配色 */
+    .userA-theme {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .userA-theme .container {
+      border: 3px solid #667eea;
+    }
+
+    .userA-theme .day.today:not(.checked) {
+      border-color: #667eea;
+      background-color: #f0f2ff;
+    }
+
+    .userB-theme {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .userB-theme .container {
+      border: 3px solid #f093fb;
+    }
+
+    .userB-theme .day.today:not(.checked) {
+      border-color: #f093fb;
+      background-color: #fff0f5;
+    }
+
+    .userB-theme .switch-user {
+      background-color: #f5576c;
+    }
+
+    .userB-theme .switch-user:hover {
+      background-color: #e54858;
+    }
+  </style>
 </head>
-<body>
+<body id="mainContainer">
 
 <div class="container">
   <div class="left">
     <div class="grid" id="signArea">
-      <div class="day">1</div>
-      <div class="day">2</div>
-      <div class="day">3</div>
-      <div class="day">4</div>
-      <div class="day">5</div>
-      <div class="day">6</div>
-      <div class="day">7</div>
+      <!-- 打卡格子會由 JavaScript 動態生成 -->
     </div>
   </div>
 
   <div class="right">
     <div class="char">
       <h3>角色資訊</h3>
-      <p>名字：蘇雨・灰石</p>
-      <p>等級：Lv.3</p>
+      <div class="character-image" id="characterImage">
+        <img src="" alt="角色頭像" onerror="this.style.display='none'; this.parentElement.innerHTML='👤';">
+      </div>
+      <div class="character-name" id="characterName">載入中...</div>
+      <div class="character-level">等級：Lv.3</div>
     </div>
     <div class="reward">
       <h3>累計獎勵</h3>
@@ -33,14 +276,150 @@
     </div>
   </div>
 
-  <button class="switch-user" onclick="switchUser()" style="display:none;">切換使用者</button>
+  <button class="switch-user" onclick="switchUser()">切換使用者</button>
 </div>
 
 <script>
-  function switchUser() {
-    alert("切換使用者功能尚未實作");
+// 使用者設定檔
+const userProfiles = {
+  userA: {
+    name: "蘇雨．灰石",
+    image: "images/userA.png",
+    themeClass: "userA-theme"
+  },
+  userB: {
+    name: "七．加爾烏斯",
+    image: "images/userB.png",
+    themeClass: "userB-theme"
   }
+};
+
+// 初始化資料
+let currentUser = "userA";
+let checkinData = {
+  userA: [false, false, false, false, false, false, false],
+  userB: [false, false, false, false, false, false, false]
+};
+let rewardData = {
+  userA: 0,
+  userB: 0
+};
+
+// 載入儲存的資料
+function loadData() {
+  const savedCurrentUser = localStorage.getItem("currentUser");
+  const savedCheckinData = localStorage.getItem("checkinData");
+  const savedRewardData = localStorage.getItem("rewardData");
+
+  if (savedCurrentUser) {
+    currentUser = savedCurrentUser;
+  }
+  if (savedCheckinData) {
+    checkinData = JSON.parse(savedCheckinData);
+  }
+  if (savedRewardData) {
+    rewardData = JSON.parse(savedRewardData);
+  }
+}
+
+// 儲存資料
+function saveData() {
+  localStorage.setItem("checkinData", JSON.stringify(checkinData));
+  localStorage.setItem("rewardData", JSON.stringify(rewardData));
+  localStorage.setItem("currentUser", currentUser);
+}
+
+// 取得今天是星期幾的索引 (0=星期一, 6=星期日)
+function getTodayIndex() {
+  const d = new Date();
+  return (d.getDay() + 6) % 7; // 將星期日從0改為6，星期一變成0
+}
+
+// 渲染使用者介面
+function renderUI() {
+  const profile = userProfiles[currentUser];
+  const signArea = document.getElementById("signArea");
+  const container = document.getElementById("mainContainer");
+  
+  // 清空打卡區域
+  signArea.innerHTML = "";
+  
+  // 更新角色資訊
+  document.getElementById("characterName").textContent = profile.name;
+  const characterImage = document.getElementById("characterImage").querySelector('img');
+  if (characterImage) {
+    characterImage.src = profile.image;
+  }
+  document.getElementById("rewardCount").textContent = rewardData[currentUser];
+
+  // 更新主題配色
+  container.classList.remove("userA-theme", "userB-theme");
+  container.classList.add(profile.themeClass);
+
+  // 生成打卡格子
+  const todayIndex = getTodayIndex();
+  const dayNames = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'];
+  
+  checkinData[currentUser].forEach((checked, idx) => {
+    const div = document.createElement("div");
+    div.className = "day";
+    
+    // 設定格子內容
+    if (checked) {
+      div.classList.add("checked");
+      div.textContent = "";
+    } else {
+      div.textContent = dayNames[idx];
+    }
+    
+    // 標記今天的格子
+    if (idx === todayIndex && !checked) {
+      div.classList.add("today");
+    }
+    
+    // 設定可點擊狀態
+    if (checked || idx !== todayIndex) {
+      div.classList.add("disabled");
+    }
+    
+    // 加入點擊事件
+    div.addEventListener("click", () => {
+      if (div.classList.contains("disabled")) return;
+      
+      // 執行打卡
+      checkinData[currentUser][idx] = true;
+      
+      // 檢查是否完成七天簽到
+      if (checkinData[currentUser].every(v => v)) {
+        rewardData[currentUser] += 1;
+        checkinData[currentUser] = [false, false, false, false, false, false, false];
+        alert(`恭喜 ${profile.name} 完成七天簽到！獲得 1 次獎勵！`);
+      }
+      
+      // 儲存並重新渲染
+      saveData();
+      renderUI();
+    });
+    
+    signArea.appendChild(div);
+  });
+}
+
+// 切換使用者
+function switchUser() {
+  currentUser = currentUser === "userA" ? "userB" : "userA";
+  saveData();
+  renderUI();
+}
+
+// 初始化應用程式
+function init() {
+  loadData();
+  renderUI();
+}
+
+// 啟動應用程式
+init();
 </script>
-<script src="script.js"></script>
 </body>
 </html>
