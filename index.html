@@ -7,26 +7,40 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <div class="nav">
-      <button onclick="switchUser('userA')">使用者 A</button>
-      <button onclick="switchUser('userB')">使用者 B</button>
-    </div>
-    <div class="frame">
-      <div class="left">
-        <h2>簽到區</h2>
-        <div class="checkin-grid" id="checkinGrid"></div>
-      </div>
-      <div class="right">
-        <div class="character">
-          <h3>目前角色：<span id="currentUser">userA</span></h3>
-        </div>
-        <div class="reward">
-          <h3>累積獎勵：<span id="rewardCount">0</span></h3>
-        </div>
-      </div>
+
+<div class="container">
+  <div class="left">
+    <div class="grid" id="signArea">
+      <div class="day">1</div>
+      <div class="day">2</div>
+      <div class="day">3</div>
+      <div class="day">4</div>
+      <div class="day">5</div>
+      <div class="day">6</div>
+      <div class="day">7</div>
     </div>
   </div>
-  <script src="script.js"></script>
+
+  <div class="right">
+    <div class="char">
+      <h3>角色資訊</h3>
+      <p>名字：蘇雨・灰石</p>
+      <p>等級：Lv.3</p>
+    </div>
+    <div class="reward">
+      <h3>累計獎勵</h3>
+      <p>已獲得獎勵次數：<span id="rewardCount">0</span> 次</p>
+    </div>
+  </div>
+
+  <button class="switch-user" onclick="switchUser()" style="display:none;">切換使用者</button>
+</div>
+
+<script>
+  function switchUser() {
+    alert("切換使用者功能尚未實作");
+  }
+</script>
+<script src="script.js"></script>
 </body>
 </html>
